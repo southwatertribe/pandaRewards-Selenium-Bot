@@ -41,12 +41,15 @@ class WebDriver(object):
 
 def lambda_handler(event, context):
     
+    #Initialize default message
     message = "Sucess"
     
+    #Instantiate driver and go to panda survey
     instance_ = WebDriver()
     driver = instance_.get()
     driver.get("https://www.pandaguestexperience.com/")
     print(driver.page_source)
+    
     #CREATE DICTS
     object = event['body']
     objectDict = json.loads(object)
@@ -65,16 +68,18 @@ def lambda_handler(event, context):
     email = mainDict["user"]["user_email"]
     #textRes
     textRes = mainDict["user"]["textres"]
+   
     
-    
+    #Submit code
     for i in range(1,7):
         submitBox = driver.find_element(By.NAME, "CN"+str(i))
         submitBox.send_keys(codeList[i-1])
         
-    
+    #Button on code submition page
     link = driver.find_element(By.ID, "NextButton")
     link.click()
     
+    #Check if code is valid
     try:
          validate = driver.find_element_by_xpath('//*[@id="errorCN5"]').text
          #validate if it worked then break out if not  
@@ -85,32 +90,46 @@ def lambda_handler(event, context):
          message = "Sucess"
     
     #Codes validated do the survey
-    
-    #Check if there is still buttons to continue 
-    link = driver.find_element(By.ID, "NextButton")
+    #Begin surver button
+    link = driver.find_elements(By.ID, "NextButton")
     
     #If there is buttons to continue... 
     while len(link) != 0:
         #Check all options
         #radio
-        radioButton = driver.find_elements(By.CLASS_NAME, "radioSimpleInput")
+        try:
+            radioButton = driver.find_elements(By.CLASS_NAME, "radioSimpleInput")
+        except NoSuchElementException:
+            radioButton = []
+            print("skip")
         #Text Response Box
-        textResBox = driver.find_elements(By.NAME, "S000077")
+        try:
+            textResBox = driver.find_elements(By.NAME, "S000077")
+        except NoSuchElementException:
+            textResBox = []
+            print("skip")
         #Email
-        emailEntry = driver.find_element(By.NAME, "S000057")
+        try:
+            emailEntry = driver.find_elements(By.NAME, "S000057")
+        except NoSuchElementException:
+            emailEntry = []
+            print("skip")
         
-        #Sleep
-        time.sleep(2)
-        
+        #Check what part of the survey we are in
         if len(emailEntry) != 0:
-            emailConf = driver.find_element(By.NAME, "S000064")
-            emailEntry.send_keys(email)
-            emailConf.send_keys(email)
+            emailConf = driver.find_elements(By.NAME, "S000064")
+            emailEntry[0].send_keys(email)
+            emailConf[0].send_keys(email)
         elif len(textResBox) !=0:
-            textResBox.send_keys(textres)
+            textResBox[0].send_keys(textRes)
         else:
             for i in range(0, len(radioButton), 5):
                 radioButton[i].click()
+                
+        #Check if we need to continue the survey 
+        link = driver.find_elements(By.ID, "NextButton")
+        if len(link) == 0:
+            break
         link[0].click()
             
         
