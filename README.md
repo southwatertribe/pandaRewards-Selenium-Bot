@@ -8,3 +8,6 @@ Then an endpoint to this function was created which is what the custom API sends
 Dynamo Db Schema
 <img width="646" alt="image" src="https://github.com/southwatertribe/pandaRewards-Selenium-Bot/assets/94877162/e02aabfd-bc13-4425-be93-04c375fa2761">
 
+Qeueue Scheme 
+<img width="319" alt="image" src="https://github.com/southwatertribe/pandaRewards-Selenium-Bot/assets/94877162/7ebe4cd4-faa9-4adf-ad52-556c1e0c9abb">
+
